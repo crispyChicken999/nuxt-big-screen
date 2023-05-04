@@ -1,6 +1,7 @@
 <template>
   <div class="factory-content">
     <dv-border-box-3 :color="color" :backgroundColor="bgColor">
+      <matrix></matrix>
     </dv-border-box-3>
   </div>
 </template>
@@ -26,7 +27,7 @@ export default {
   --top-mini-box-width: 600px;
   --box-inner-padding: 20px;
 
-  padding: 12px;
+  padding: 12px 0;
   display: flex;
   gap: var(--flex-gap);
   flex-direction: column;
@@ -48,8 +49,10 @@ export default {
     min-width: 430px;
     box-sizing: border-box;
     padding: var(--box-inner-padding);
+
     /deep/.border-box-content {
       display: flex;
+      overflow: hidden;
       flex-direction: column;
     }
     /deep/.el-tabs {

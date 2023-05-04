@@ -3,6 +3,7 @@
     <div class="top">
       <div class="left">
         <dv-border-box-7
+          v-zoom-up
           :color="color"
           :backgroundColor="bgColor"
           :key="`first-${boxContainerKey}`"
@@ -13,6 +14,7 @@
           </div>
         </dv-border-box-7>
         <dv-border-box-7
+          v-zoom-up
           :color="color"
           :backgroundColor="bgColor"
           :key="`second-${boxContainerKey}`"
@@ -25,7 +27,8 @@
       </div>
       <div class="middle">
         <dv-border-box-9
-          :color="color"
+          v-zoom-up:table-visible.normalShadow="false"
+          :color="['#18ffff', '#1d39c4']"
           :backgroundColor="bgColor"
           :key="`third-${boxContainerKey}`"
         >
@@ -37,12 +40,13 @@
         </dv-border-box-9>
       </div>
       <div class="right">
-        <dv-border-box-7
-          :color="color"
-          :backgroundColor="bgColor"
-          :key="`fourth-${boxContainerTabsKey}`"
-        >
-          <div class="right-top-content">
+        <dv-border-box-7 v-zoom-up :color="color" :backgroundColor="bgColor">
+          <div
+            class="right-top-content"
+            :key="`fourth-${boxContainerTabsKey}`"
+            @mouseleave="initTopRightTabsInterval"
+            @mouseenter="removeTopRightTabsInterval"
+          >
             <el-tabs
               v-model="topRightTabs"
               @tab-click="handleTopRightTabsClick"
@@ -61,13 +65,9 @@
             <dv-decoration-2 :color="color" :dur="3" />
           </div>
         </dv-border-box-7>
-        <dv-border-box-7
-          :color="color"
-          :backgroundColor="bgColor"
-          :key="`fifth-${boxContainerKey}`"
-        >
+        <dv-border-box-7 v-zoom-up :color="color" :backgroundColor="bgColor">
           <common-title>母液用量</common-title>
-          <div class="right-bottom-content">
+          <div class="right-bottom-content" :key="`fifth-${boxContainerKey}`">
             <charts-radar-consumption></charts-radar-consumption>
           </div>
         </dv-border-box-7>
@@ -80,15 +80,21 @@
         :key="`sixth-${boxContainerKey}`"
       >
         <div class="bottom-content">
-          <el-tabs v-model="bottomTabs">
+          <el-tabs v-model="bottomTabs" class="bottom-tabs">
             <el-tab-pane label="染色化料" name="chemical">
-              <tables-dye-chemical></tables-dye-chemical>
+              <tables-dye-chemical
+                v-if="bottomTabs === 'chemical'"
+              ></tables-dye-chemical>
             </el-tab-pane>
             <el-tab-pane label="染色用料" name="consume">
-              <tables-dye-consumption></tables-dye-consumption>
+              <tables-dye-consumption
+                v-if="bottomTabs === 'consume'"
+              ></tables-dye-consumption>
             </el-tab-pane>
             <el-tab-pane label="浆染过程耗能" name="energy">
-              <tables-dye-energy-consumption></tables-dye-energy-consumption>
+              <tables-dye-energy-consumption
+                v-if="bottomTabs === 'energy'"
+              ></tables-dye-energy-consumption>
             </el-tab-pane>
           </el-tabs>
           <dv-decoration-3 />
@@ -100,6 +106,8 @@
 </template>
 
 <script>
+let topRightTabsTimer = null;
+let bottomTabsTimer = null;
 export default {
   data() {
     return {
@@ -124,10 +132,54 @@ export default {
           this.boxContainerTabsKey++;
         });
       });
+      this.initTabsInterval();
     },
+
+    // 刷新key，触发echart重绘
     handleTopRightTabsClick() {
       this.boxContainerTabsKey++;
     },
+
+    // 初始化tab自动切换
+    initTabsInterval() {
+      this.initTopRightTabsInterval();
+      // this.initBottomTabsInterval();
+    },
+
+    // 初始化右上角tab自动切换
+    initTopRightTabsInterval() {
+      topRightTabsTimer = setInterval(() => {
+        let list = ["water", "gas", "liquid"];
+        let index = list.findIndex((item) => item === this.topRightTabs);
+        [undefined].includes(index) && (index = 0);
+        this.topRightTabs = list[index + 1 === list.length ? 0 : index + 1];
+        this.boxContainerTabsKey++;
+      }, 5000);
+    },
+
+    // 清除右上角tab自动切换
+    removeTopRightTabsInterval() {
+      clearInterval(topRightTabsTimer);
+    },
+
+    // 初始化底部tab自动切换
+    initBottomTabsInterval() {
+      bottomTabsTimer = setInterval(() => {
+        let list = ["chemical", "consume", "energy"];
+        let index = list.findIndex((item) => item === this.bottomTabs);
+        [undefined].includes(index) && (index = 0);
+        this.bottomTabs = list[index + 1 === list.length ? 0 : index + 1];
+      }, 8000);
+    },
+
+    // 清除底部tab自动切换
+    removeBottomTabsInterval() {
+      clearInterval(bottomTabsTimer);
+    },
+  },
+  beforeDestroy() {
+    clearInterval(topRightTabsTimer);
+    clearInterval(bottomTabsTimer);
   },
 };
 </script>
@@ -168,6 +220,11 @@ export default {
       flex: 1;
       display: flex;
       flex-direction: column;
+      &.bottom-tabs {
+        .el-tabs__content {
+          flex: 1 0 0;
+        }
+      }
       .el-tabs__header {
         .el-tabs__nav-wrap {
           &::after {
@@ -199,6 +256,7 @@ export default {
         flex: 1;
         .el-tab-pane {
           height: 100%;
+          overflow: hidden;
         }
       }
     }

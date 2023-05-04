@@ -82,8 +82,8 @@ export default {
           },
         },
         globe: {
-          baseTexture: require("@/assets/imgs/baseTexture.jpg"),
-          heightTexture: require("@/assets/imgs/heightTexture.jpg"),
+          baseTexture: require("@/assets/imgs/base-texture.jpg"),
+          heightTexture: require("@/assets/imgs/height-texture.jpg"),
           top: "middle",
           left: "center",
           displacementScale: 0.04,
@@ -99,7 +99,7 @@ export default {
             innerGlowPower: 4,
           },
           viewControl: {
-            distance: 150,
+            distance: 170,
             autoRotate: true,
             maxDistance: 230,
             alpha: 28,
@@ -123,7 +123,7 @@ export default {
             lineStyle: {
               width: 1,
               color: "#18ffff",
-              opacity: 0.05,
+              opacity: 0.02,
             },
             data: [],
             silent: false,
@@ -144,7 +144,7 @@ export default {
             lineStyle: {
               width: 1,
               color: "#448aff",
-              opacity: 0.0,
+              opacity: 0.02,
             },
             data: [],
             silent: false,
@@ -215,12 +215,12 @@ export default {
           data: [item.point], // 数据来源
         };
       });
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 33; i++) {
         this.options.series[0].data = this.options.series[0].data.concat(
           this.randomData("韶关")
         );
       }
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 32; i++) {
         this.options.series[1].data = this.options.series[1].data.concat(
           this.randomData("越南")
         );

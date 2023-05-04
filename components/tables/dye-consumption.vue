@@ -1,7 +1,11 @@
 <template>
   <div class="dye-chemical">
     <el-table
+      fit
+      ref="table"
+      height="100%"
       :data="tableData"
+      v-loading="isLoading"
       :header-cell-style="{
         color: '#fff',
         textAlign: 'center',
@@ -17,11 +21,10 @@
         borderColor: '#133F82',
         background: 'transparent',
       }"
-      fit
-      ref="table"
-      height="100%"
       @cell-mouse-enter="mouseEnter"
       @cell-mouse-leave="mouseLeave"
+      element-loading-text="加载中..."
+      element-loading-background="rgba(0, 0, 0, 0.8)"
     >
       <el-table-column prop="sh" label="基本资料">
         <el-table-column prop="scdh" label="生产单号"></el-table-column>
@@ -93,6 +96,7 @@ export default {
   data() {
     return {
       tableData: [],
+      isLoading: false,
     };
   },
   created() {},
@@ -102,6 +106,16 @@ export default {
   computed: {},
   methods: {
     getTableData() {
+      if (sessionStorage.getItem("dyeConsumptionTableData")) {
+        this.tableData = JSON.parse(
+          sessionStorage.getItem("dyeConsumptionTableData")
+        );
+        this.$nextTick(() => {
+          timer = requestAnimationFrame(this.startScroll);
+        });
+        return;
+      }
+      this.isLoading = true;
       this.$axios
         .post("http://120.78.186.60:8091/ErpSg/api/getFzclRsylData")
         .then((res) => {
@@ -109,6 +123,13 @@ export default {
           this.$nextTick(() => {
             timer = requestAnimationFrame(this.startScroll);
           });
+          sessionStorage.setItem(
+            "dyeConsumptionTableData",
+            JSON.stringify(this.tableData)
+          );
+        })
+        .finally(() => {
+          this.isLoading = false;
         });
     },
     startScroll() {
@@ -129,6 +150,11 @@ export default {
   },
   destroyed() {
     cancelAnimationFrame(timer);
+  },
+  beforeUpdate() {
+    this.$nextTick(() => {
+      this.$refs.table.doLayout();
+    });
   },
 };
 </script>
@@ -158,6 +184,19 @@ export default {
       height: 25px;
       line-height: 25px;
     }
+
+    &.is-header-transparent {
+      .el-table__header {
+        tr {
+          background: transparent;
+        }
+        th {
+          background: rgba(12, 17, 69, 0.334) !important;
+          transition: background 0.3s;
+        }
+      }
+    }
+
     .el-table__body tr,
     .el-table__body td {
       padding: 0;

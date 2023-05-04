@@ -25,7 +25,7 @@ export default {
   mounted() {
     setTimeout(() => {
       this.isLoading = false;
-    }, 1500);
+    }, 1234);
   },
   methods: {},
 };
@@ -53,6 +53,9 @@ export default {
   .screen-box {
     background-size: cover;
     background-image: url("~assets/imgs/bg.png");
+    ::v-deep(.screen-wrapper)  {
+      z-index: 9999;
+    }
   }
 
   #dv-full-screen-container {

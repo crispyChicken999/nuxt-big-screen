@@ -1,8 +1,28 @@
 <template>
   <div class="factory-content">
-    <dv-border-box-3 :color="color" :backgroundColor="bgColor"
-      >你干嘛哎哟-原理</dv-border-box-3
-    >
+    <dv-border-box-3 :color="color" :backgroundColor="bgColor">
+      <matrix></matrix>
+      <div
+        v-loading="isLoading"
+        class="video-container"
+        element-loading-text="视频加载中..."
+        element-loading-background="rgba(0, 0, 0, 0.8)"
+      >
+        <dv-border-box-8 :color="color" :dur="8">
+          <video
+            muted
+            ref="video"
+            loop="loop"
+            width="1920"
+            height="1080"
+            mediatype="video"
+            autoplay="autoplay"
+          >
+            <source src="/videos/theory.mp4" type="video/mp4" />
+          </video>
+        </dv-border-box-8>
+      </div>
+    </dv-border-box-3>
   </div>
 </template>
 
@@ -12,10 +32,25 @@ export default {
     return {
       color: ["#0E65BB", "#00e5ff"],
       bgColor: "#0A123C75",
+      isLoading: true,
     };
   },
   created() {},
-  mounted() {},
+  mounted() {
+    this.$refs.video.addEventListener("play", () => {
+      this.isLoading = false;
+    });
+
+    this.$refs.video.addEventListener("error", () => {
+      this.isLoading = false;
+      this.$message.error("视频加载失败");
+    });
+
+    this.$refs.video.addEventListener("abort", () => {
+      this.isLoading = false;
+      this.$message.error("视频加载失败");
+    });
+  },
   computed: {},
   methods: {},
 };
@@ -27,7 +62,7 @@ export default {
   --top-mini-box-width: 600px;
   --box-inner-padding: 20px;
 
-  padding: 12px;
+  padding: 12px 0;
   display: flex;
   gap: var(--flex-gap);
   flex-direction: column;
@@ -51,7 +86,14 @@ export default {
     padding: var(--box-inner-padding);
     /deep/.border-box-content {
       display: flex;
+      overflow: hidden;
+      align-items: center;
       flex-direction: column;
+      justify-content: center;
+    }
+    video {
+      position: relative;
+      top: -10px;
     }
     /deep/.el-tabs {
       flex: 1;

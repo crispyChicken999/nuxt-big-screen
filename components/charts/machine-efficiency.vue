@@ -1,9 +1,14 @@
 <template>
-  <div class="efficiency">
+  <div
+    class="efficiency"
+    @mouseenter="removeAutoRunInterval"
+    @mouseleave="initAutoRunInterval"
+  >
     <div class="machine-detail">
       <h2>机位</h2>
       <p>平均运行时间</p>
       <div class="percent">
+        <dv-decoration-12 :color="['#29C2F6', '#06CDF8']" />
         <p>
           {{
             currentRow.machineNo && currentRow.machineNo.split("")[0]
@@ -54,6 +59,7 @@
 <script>
 let timer = null;
 let timeout = null;
+let autoRunTimer = null;
 import { baseURL } from "@/assets/js/request";
 export default {
   data() {
@@ -108,7 +114,8 @@ export default {
     this.getChartData();
     timer = setInterval(() => {
       this.getChartData();
-    }, 5000);
+    }, this.$settings.fetchDataInterval);
+    this.initAutoRunInterval();
   },
   computed: {},
   methods: {
@@ -126,23 +133,9 @@ export default {
       timeout = setTimeout(() => {
         timer = setInterval(() => {
           this.getChartData();
-        }, 5000);
+        }, this.$settings.fetchDataInterval);
       }, 3000);
     },
-    // generateRandomNum() {
-    //   this.machineTable.forEach((item) => {
-    //     item.produceNum =
-    //       Number(item.produceNum) + Math.floor(Math.random() * 5 + 1);
-    //     item.efficiency = Math.floor(Math.random() * 100 + 1) + "%";
-    //     item.time = Number(
-    //       (item.time + Number((Math.random() * 0.5).toFixed(1))).toFixed(1)
-    //     );
-    //   });
-    //   this.config.number[0] = Number(
-    //     this.machineTable[this.rowIndex].efficiency.replace("%", "")
-    //   );
-    //   this.config = { ...this.config }; //对象解构，更新props
-    // },
     getChartData() {
       this.$axios.get(`${baseURL}/api/leftTop`).then((res) => {
         if (res && res.data) {
@@ -159,6 +152,20 @@ export default {
           this.config = { ...this.config };
         }
       });
+    },
+    initAutoRunInterval() {
+      autoRunTimer = setInterval(() => {
+        this.rowIndex = this.rowIndex + 1 > 4 ? 0 : this.rowIndex + 1;
+        this.currentRow = this.machineTable[this.rowIndex];
+        this.config.number[0] = Number(
+          this.currentRow.efficiency &&
+            this.currentRow.efficiency.replace("%", "")
+        );
+        this.config = { ...this.config };
+      }, 3000);
+    },
+    removeAutoRunInterval() {
+      clearInterval(autoRunTimer);
     },
   },
   beforeDestroy() {
@@ -196,10 +203,19 @@ export default {
       gap: 8px;
       align-items: center;
       justify-content: center;
-      background: url("~assets/imgs/machine-bg.png");
+      // background: url("~assets/imgs/machine-bg.png");
       background-size: cover;
+      position: relative;
+      .dv-decoration-12 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -1;
+      }
       p {
-        color: #6648ff;
+        color: #5ec3da;
       }
       h1 {
         font-size: 36px;

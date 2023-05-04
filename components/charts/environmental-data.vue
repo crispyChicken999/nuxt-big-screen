@@ -49,10 +49,10 @@ export default {
             axisLabel: {
               interval: 0,
               margin: 5,
-              rotate: 0,
+              rotate: 30,
               textStyle: {
-                fontSize: 8,
-                color: "#ffffff85",
+                fontSize: 9,
+                color: "#ffffff88",
               },
             },
             axisLine: {
@@ -199,7 +199,7 @@ export default {
     this.getChartData();
     timer = setInterval(() => {
       this.getChartData();
-    }, 5000);
+    }, this.$settings.fetchDataInterval);
   },
   computed: {},
   methods: {

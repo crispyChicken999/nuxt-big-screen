@@ -22,10 +22,15 @@ export default {
   computed: {},
   methods: {
     generateGlitch() {
+      // Select all the lines
       const LINE_LIST = [...document.querySelectorAll(".hexagon-line")];
+      // For each line
       LINE_LIST.forEach((line) => {
+        // Select all the hexagons
         const CHILD_LIST = [...line.children];
+        // For each hexagon
         CHILD_LIST.forEach((child) => {
+          // Decide if it should be bright or not
           if (Math.random() > 0.5) {
             child.classList.add("bright");
           } else {

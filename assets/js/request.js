@@ -4,8 +4,8 @@ if (process.env.NODE_ENV == "production") {
   baseURL = "http://data-center.goomaker.com";
 } else {
   //本地环境
-  // baseURL = "http://data-center.goomaker.com";
-  baseURL = "http://192.168.1.106:8081";
+  baseURL = "http://data-center.goomaker.com";
+  // baseURL = "http://192.168.1.106:8081";
 }
 
 export { baseURL };

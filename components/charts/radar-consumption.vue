@@ -224,7 +224,7 @@ export default {
     timer = setInterval(() => {
       this.getLeftChartData();
       this.getRightChartData();
-    }, 5000);
+    }, this.$settings.fetchDataInterval);
   },
   computed: {},
   methods: {

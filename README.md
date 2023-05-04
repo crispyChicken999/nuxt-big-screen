@@ -1,6 +1,7 @@
-# nuxt-website
+# nuxt-big-screen
 
 这是 `中恒智造-大屏展示` 的前端项目
+> 推荐node版本 16.13.0
 
 ## 构建设置
 

@@ -43,69 +43,89 @@ export default {
   name: "TopHeader",
   data() {
     return {
-      isFullScreen: this.isFullscreenForNoScroll(),
+      isFullScreen: false,
     };
   },
+  mounted() {
+    this.isFullScreen = this.isFullScreenOrNot();
+    window.addEventListener("fullscreenchange", this.handleResize, false);
+    window.addEventListener("keydown", this.handleKeydown, false);
+    this.$once("hook:beforeDestory", () => {
+      window.removeEventListener("fullscreenchange", this.handleResize, false);
+      window.removeEventListener("keydown", this.handleKeydown, false);
+    });
+  },
   methods: {
-    isFullscreenForNoScroll() {
-      var explorer = window.navigator.userAgent.toLowerCase();
-      if (explorer.indexOf("chrome") > 0) {
-        //webkit
-        if (
-          document.body.scrollHeight === window.screen.height &&
-          document.body.scrollWidth === window.screen.width
-        ) {
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        //IE 9+ fireFox
-        if (
-          window.outerHeight === window.screen.height &&
-          window.outerWidth === window.screen.width
-        ) {
-          return true;
-        } else {
-          return false;
-        }
+    // 监听窗口大小变化
+    handleResize() {
+      this.isFullScreen = this.isFullScreenOrNot();
+    },
+
+    // 监听键盘事件
+    handleKeydown(e) {
+      e = e || window.event;
+      if (e.keyCode === 122 && !this.isFullScreen) {
+        e.preventDefault();
+        this.requestFullScreen();
       }
     },
+
+    // 判断是否全屏
+    isFullScreenOrNot() {
+      return !!(
+        Math.abs(
+          window.screen.height - window.document.documentElement.clientHeight
+        ) <= 17 ||
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
+      );
+    },
+
+    // 切换全屏状态
     switchFullScreen() {
-      let isFullScreen = this.isFullscreenForNoScroll();
-      if (isFullScreen) {
-        if (document.exitFullScreen) {
-          document.exitFullscreen();
-        }
-        //兼容火狐
-        if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        }
-        //兼容谷歌等
-        if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        }
-        //兼容IE
-        if (document.msExitFullscreen) {
-          document.msExitFullscreen();
-        }
+      this.isFullScreen = this.isFullScreenOrNot();
+      if (this.isFullScreen) {
+        this.exitFullScreen();
       } else {
-        if (document.documentElement.RequestFullScreen) {
-          document.documentElement.RequestFullScreen();
-        }
-        //兼容火狐
-        if (document.documentElement.mozRequestFullScreen) {
-          document.documentElement.mozRequestFullScreen();
-        }
-        //兼容谷歌等可以webkitRequestFullScreen也可以webkitRequestFullscreen
-        if (document.documentElement.webkitRequestFullScreen) {
-          document.documentElement.webkitRequestFullScreen();
-        }
-        //兼容IE,只能写msRequestFullscreen
-        if (document.documentElement.msRequestFullscreen) {
-          document.documentElement.msRequestFullscreen();
-        }
+        this.requestFullScreen();
       }
+    },
+
+    // 全屏
+    requestFullScreen() {
+      let el = document.documentElement;
+      let rfs =
+        el.requestFullScreen ||
+        el.webkitRequestFullScreen ||
+        el.mozRequestFullScreen ||
+        el.msRequestFullscreen;
+      if (rfs) {
+        rfs.call(el);
+      } else if (typeof window.ActiveXObject !== "undefined") {
+        let wscript = new ActiveXObject("WScript.Shell");
+        wscript && wscript.SendKeys("{F11}");
+      }
+      this.isFullScreen = true;
+    },
+
+    // 退出全屏
+    exitFullScreen() {
+      let el = document;
+      let cfs =
+        el.cancelFullScreen ||
+        el.mozCancelFullScreen ||
+        el.msExitFullscreen ||
+        el.webkitExitFullscreen ||
+        el.exitFullscreen;
+      if (cfs) {
+        cfs.call(el);
+      } else if (typeof window.ActiveXObject !== "undefined") {
+        let wscript = new ActiveXObject("WScript.Shell");
+        wscript && wscript.SendKeys("{F11}");
+      }
+      this.isFullScreen = false;
     },
   },
 };
@@ -113,19 +133,15 @@ export default {
 
 <style lang="less">
 #top-header {
-  position: relative;
   width: 100%;
   height: 100px;
   display: flex;
-  justify-content: space-between;
   flex-shrink: 0;
-  // background: url("~assets/imgs/header-bg.png");
-  background-size: 100% auto;
-  background-repeat: no-repeat;
-  // animation: glow 3s ease-in-out infinite forwards;
   position: relative;
   transition: all 0.3s;
-
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  justify-content: space-between;
   @keyframes glow {
     0% {
       filter: saturate(1);
@@ -198,6 +214,7 @@ export default {
     }
     &:hover {
       color: #fff;
+      border-radius: 6px;
       background: #2884f4;
       box-shadow: 0 0 0.2rem #1967f8, 0 0 0.2rem #1967f8, 0 0 2rem #1967f8,
         0 0 0.8rem #1967f8, 0 0 2.8rem #1967f8, inset 0 0 1.3rem #1967f8;
@@ -213,6 +230,7 @@ export default {
         display: inline-block;
         transform: skewX(30deg);
       }
+
     }
     &.fullscreen {
       left: initial;

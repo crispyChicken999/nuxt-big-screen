@@ -2,3 +2,24 @@
   font-family: 'moto-verse';
   src: url("../fonts/motoverse-yw5lm.ttf");
 }
+
+@font-face {
+  font-family: 'parcel';
+  src: url('../fonts/parcel.ttf');
+}
+
+@font-face {
+  font-family: 'console';
+  src: url('../fonts/console.ttf');
+}
+
+@font-face {
+  font-family: 'Khalijaka-black';
+  src: url('../fonts/Khalijaka-black.ttf');
+}
+
+
+@font-face {
+  font-family: 'Khalijaka-outline';
+  src: url('../fonts/Khalijaka-outline.ttf');
+}

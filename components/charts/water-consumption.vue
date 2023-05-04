@@ -147,7 +147,7 @@ export default {
     this.getChartData();
     timer = setInterval(() => {
       this.getChartData();
-    }, 5000);
+    }, this.$settings.fetchDataInterval);
   },
   computed: {},
   methods: {
